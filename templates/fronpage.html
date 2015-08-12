@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>MyBlog</title>
+		
+		<link rel="stylesheet" type="text/css" href="/static/main.css">
+	</head>
+
+	<body>
+		
+		<div class="main-title"><a href="/blog">Blog</a></div>
+		
+		{% for blog in blogs %}
+			<div class="post">
+				
+				<div class="post-title"><a href="/blog/{{blog.key().id()}}">{{blog.title}}</a></div>
+				<div class="post-date">
+					<div class="pull-right">
+						{{blog.created.strftime("%b %d, %Y")}}</div>
+					</div>
+				<hr>
+				<div class="post-content">{{blog.content}}</div>
+			</div>
+		{% endfor %}
+
+		<div class="age">Queried {{time_gap}} seconds ago</div>
+	</body>
+
+</html>
