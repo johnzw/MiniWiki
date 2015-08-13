@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <link rel="stylesheet" type="text/css" href="/static/main.css">
+
+    
+  </head>
+
+  <body>
+    <div class="nav">
+      <div class="container">
+
+        <div class="control">
+          <li>{{username}}<a href="/logout">(Logout)</a></li>
+        </div>
+        
+        <div class="control">
+          <li><a href="/_edit/{{title}}?v={{version}}">Edit</a></li>
+          <li>|</li>
+          <li><a href="/_history/{{title}}">History</a></li>
+        </div>
+        
+      </div>
+    </div>
+		{{content|safe}}
+    
+  </body>
+</html>

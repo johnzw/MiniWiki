@@ -228,12 +228,17 @@ class WikiPage(Handler):
 				page = Page.get_by_id(int(version))
 				if page:
 					page=[page]
+					if username:
+						self.render("wikipage_user_version.html",username=username,title=title,version=version,content=page[0].content)
+						return
 				else:
 					self.redirect("/"+title)
 					return
 			else:
 				self.redirect("/"+title)
 				return
+
+
 				
 		else:
 			query = Page.fetchPages(title)
