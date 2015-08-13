@@ -141,9 +141,25 @@ class EditPage(Handler):
 					return
 
 		if username:
+			#check whether the request has version para in it
+			page=None
+			version = self.request.get("v")
+
+			if version:
+				if version.isdigit():
+					page = Page.get_by_id(int(version))
+					if page:
+						page=[page]
+					else:
+						self.error("404")
+						return
+				else:
+					self.error("404")
+					return
 			# check whether the page has been created
-			query = Page.fetchPages(title)
-			page = query.fetch(1)
+			else:
+				query = Page.fetchPages(title)
+				page = query.fetch(1)
 
 			if page:
 				self.render_front(username=username,title=title,content=page[0].content)
@@ -170,21 +186,20 @@ class EditPage(Handler):
 
 			content = self.request.get("content")
 
-			if content:
-				if len(str.strip(str(content))):
-					#save to Page
+			if content and len(str.strip(str(content))):
+				#save to Page
 
-					page = Page(title=title,content=content)
-					page.put()
-					
-					self.redirect("/"+title)
+				page = Page(title=title,content=content)
+				page.put()
+				
+				self.redirect("/"+title)
 			else:
-				error="the content must not be empty"
+				error="the content must contain somthing.."
 				self.render_front(username=username,title=title,error=error,content=content)
 		else:
 			#punish the stupid hacker	
 			self.error("404")
-			return
+			return 
 		
 class WikiPage(Handler):
 
@@ -206,9 +221,24 @@ class WikiPage(Handler):
 					self.error("404")
 					return
 
-		query = Page.fetchPages(title)
-		page = query.fetch(1)
-		# get to be done
+		version = self.request.get("v")
+
+		if version:
+			if version.isdigit():
+				page = Page.get_by_id(int(version))
+				if page:
+					page=[page]
+				else:
+					self.redirect("/"+title)
+					return
+			else:
+				self.redirect("/"+title)
+				return
+				
+		else:
+			query = Page.fetchPages(title)
+			page = query.fetch(1)
+			# get to be done
 
 		if username:
 			if page:
@@ -217,7 +247,7 @@ class WikiPage(Handler):
 				self.redirect("/_edit/"+title)
 		else:
 			if page:
-				self.render("wikipage_normal.html",content=page[0].content)
+				self.render("wikipage_normal.html",title=title,content=page[0].content)
 			else:
 				self.write("<h1>Authentication Failed</h1>"\
 							"<h1>GO BACK BOY!</h1>")
@@ -225,6 +255,34 @@ class WikiPage(Handler):
 class HistoryPage(Handler):
 	
 	def get(self, title):
+		#check user identity
+		cookie_val = self.request.cookies.get('user_id')
+		username = None
+		#check whether it is login user
+		if cookie_val:
+			user_id = util.check_secure_val(cookie_val)
+			if user_id:
+				user_id = int(user_id)
+				user = User.get_by_id(user_id)
+
+				if user:
+					username = user.username
+					#punish the stupid hacker
+				else:	
+					self.error("404")
+					return
+		
+		query = Page.fetchPages(title)
+		pages = list(query)
+	
+		if pages:
+			if username:
+				self.render("history_user.html",title=title,username=username,pages=pages)
+			else:
+				self.render("history_normal.html",title=title,pages=pages)
+		else:
+			self.redirect("/")
+		
 		
 		
 class LoginPage(Handler):
@@ -358,5 +416,6 @@ app = webapp2.WSGIApplication([('/flush',FlushHandler),
     							('/login',LoginPage),
     							('/logout',LogoutPage),
     							('/_edit/(\w*)',EditPage),
+    							('/_history/(\w*)',HistoryPage),
     							('/(\w*)',WikiPage)], 
     							debug=True)

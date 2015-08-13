@@ -1,0 +1,15 @@
+{% extends "base_user.html" %}
+{% block content %}
+<div>
+<table border="1">
+{% for page in pages %}
+<tr>
+	<td colspan="5">{{page.created.strftime("%H:%M:%S %b %d, %Y")}}</td>
+	<td colspan="20">{{page.content}}</td>
+	<td colspan="20"> <a href="/{{page.title}}?v={{page.key().id()}}">view</a> | <a href="/_edit/{{page.title}}?v={{page.key().id()}}">edit</a> </td>
+
+</tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}
