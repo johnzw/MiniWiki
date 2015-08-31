@@ -7,31 +7,39 @@
 	</head>
 
 	<body>
+		<div class="nav">
+      		<div class="container">
+        		<ul class="control">
+          			<li><a href="/login">Login</a></li>
+        		</ul>
+        
+      		</div>
+    	</div>
 		<h1>Sign Up</h1>
 
 		<form method="post">
 			<div>
 				<label>Username</label>
 				<input type="text" name="username" value="{{username}}">
-				<label>{{error_username}}</label>
+				<label class=error>{{error_username}}</label>
 			</div>
 
 			<div>
 				<label>Password</label>
 				<input type="password" name="password" value="{{password}}">
-				<label>{{error_password}}</label>
+				<label class=error>{{error_password}}</label>
 			</div>
 			
 			<div>
 				<label>Verify Password</label>
 				<input type="password" name="verify" value="{{verifypw}}">
-				<label>{{error_verifypw}}</label>
+				<label class=error>{{error_verifypw}}</label>
 			</div>
 
 			<div>
 				<label>Email(optional)</label>
 				<input type="text" name="email" value="{{email}}">
-				<label>{{error_email}}</label>
+				<label class=error>{{error_email}}</label>
 			</div>
 			<br>
 			<input type="submit" value="submit">

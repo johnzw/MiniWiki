@@ -1,0 +1,89 @@
+Instructor Notes
+
+In order to be graded correctly for this project, there are a few things to keep in mind. We'll be grading your web app by signing in to your wiki, then trying to create and edit random pages. Therefore, any path we choose should either:
+
+Go to that page if it has already been created.
+Go to an edit page if that page doesn't yet exist, assuming the user is signed in.
+The only static url we'll be requiring for this part is that the url for users to signup is at:
+
+signup_url = url + "/signup"
+Where 'url' is the url that you have entered in the text box above.
+
+In order to get arbitrary paths working, you might want to have something like this for your routing table:
+
+PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'
+app = webapp2.WSGIApplication([('/signup', Signup),
+                               ('/login', Login),
+                               ('/logout', Logout),
+                               ('/_edit' + PAGE_RE, EditPage),
+                               (PAGE_RE, WikiPage),
+                               ],
+                              debug=DEBUG)
+
+
+@login 
+1)type the url that doesn’t exit:
+	_edit/page_name(create new page)
+	edit
+
+2)view and edit
+
+@logout
+1)view
+
+@signup
+
+
+
+Issue
+1)Edit the previous versions of the wiki page
+	the url better still be /_edit/somthing
+
+	1)post on “edit” hyperlink
+	2)redirect to “/_edit/something”
+work->	3)well, add get para in the url ***
+
+2)template (not that important)
+	maybe merge separate templates into whole(is this good ideas)
+	or find a way to better manage them
+3)
+css
+	There is a lot of work on this.
+		check out the instruction
+
+4)
+clear unnecessary url mapping and handlers
+
+—>address
+
+5)
+final test
+	state:log-in
+	state:as a vistor
+
+—>address
+
+6)
+Need to cache user info, otherwise I have to hit database every fucking time.
+
+—>address this issue, but for the sake of convenienty, I cancel some punishment to malicious user.
+
+Bugs
+
+important)***
+change version to some arbitrary numbers or characters:
+	things go crazy..
+
+***we need add “return” after the redirect method.
+	because the code will continue after the redirect method is executed.
+
+annoying)
+database
+	It doesn’t show the latest page until one more hit
+
+1)
+beginning issues
+	When the database is empty, the homepage won’t show up
+
+	
+	

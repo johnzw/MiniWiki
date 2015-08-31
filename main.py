@@ -27,94 +27,24 @@ class Handler(webapp2.RequestHandler):
 	def render(self, template, **kw):
 		self.write(self.render_str(template,**kw))
 
-def top_blog(update=False):
-	key="top"
-	time_key='gen_time'
 
-	blogs = memcache.get(key)
-
-	if blogs is None or update:
-		logging.error("DB QUERY")
-		blogs = db.GqlQuery("select * from Blog ORDER By created DESC")
-
-		blogs = list(blogs)
-		memcache.set(key,blogs)
-
-		#save into quried time into the memcache
-		timestamp = datetime.datetime.now()
-		memcache.set(time_key,timestamp)
-
-	gen_timestamp = memcache.get(time_key)
-	cur_timestamp = datetime.datetime.now()
-
-	time_gap = (cur_timestamp - gen_timestamp).seconds
+def checkUser(cookie_val):
 	
-	return time_gap, blogs
+	username = memcache.get(cookie_val)
 
-class MainPage(Handler):
-	"""docstring for MainPage"""
-	def render_front(self):
-		time_gap, blogs = top_blog()
-		self.render("fronpage.html", time_gap=time_gap, blogs=blogs)
-	
-	def get(self):
-		self.render_front()
+	if not username:
+		user_id = util.check_secure_val(cookie_val)
+		logging.error(user_id)
+		if user_id:
+			user_id = int(user_id)
+			user = User.get_by_id(user_id)
+			logging.error("Hit Database")
 
-def spec_blog(blog_id):
-	
-	blogs = memcache.get(blog_id)
+			if user:
+				username = user.username
+				memcache.set(cookie_val,username)
 
-	if not blogs:
-		blog = Blog.get_by_id(int(blog_id))
-		if blog:
-			blogs =[blog]
-			memcache.set(blog_id,blogs)
-			timestamp = datetime.datetime.now()
-			memcache.set('time|'+blog_id, timestamp)
-		else:
-			return None, None
-
-	cur_timestamp = datetime.datetime.now()
-	gen_timestamp = memcache.get('time|'+blog_id)
-	time_gap = (cur_timestamp - gen_timestamp).seconds
-
-	return time_gap, blogs
-
-class PostHandler(Handler):
-	"""docstring for PostHandler"""
-	def get(self, blog_id):
-		time_gap, blogs = spec_blog(blog_id)
-		if blogs:
-			self.render("fronpage.html", time_gap=time_gap, blogs=blogs)
-		else:
-			self.error(404)
-			return
-
-
-class PostPage(Handler):
-	"""docstring for PostPage"""
-	def render_front(self, title="", content="", error=""):
-		self.render("post.html", title=title, content=content,error=error)
-	
-	def get(self):
-		self.render_front()
-
-	def post(self):
-		title = self.request.get("subject")
-		content = self.request.get("content")
-
-		if title and content:
-			blog = Blog(title=title,content=content)
-			blog.put()
-			
-
-			blog_id = str(blog.key().id())
-			top_blog(True)
-			
-			self.redirect("/blog/"+blog_id)
-		else:
-			error="subject and content, please!"
-			self.render_front(error=error,title=title,content=content)
+	return username
 
 class EditPage(Handler):
 	
@@ -125,20 +55,8 @@ class EditPage(Handler):
 
 		# check the user identity
 		cookie_val = self.request.cookies.get('user_id')
-		username = None
 		#check whether it is login user
-		if cookie_val:
-			user_id = util.check_secure_val(cookie_val)
-			if user_id:
-				user_id = int(user_id)
-				user = User.get_by_id(user_id)
-
-				if user:
-					username = user.username
-				else:
-					#punish the stupid hacker	
-					self.error("404")
-					return
+		username = checkUser(cookie_val)
 
 		if username:
 			#check whether the request has version para in it
@@ -171,17 +89,9 @@ class EditPage(Handler):
 	def post(self, title):
 		# check the user identity
 		cookie_val = self.request.cookies.get('user_id')
-		username = None
-		#check whether it is login user
-		if cookie_val:
-			user_id = util.check_secure_val(cookie_val)
-			if user_id:
-				user_id = int(user_id)
-				user = User.get_by_id(user_id)
 
-				if user:
-					username = user.username
-				
+		#check whether it is login user
+		username = checkUser(cookie_val)	
 		if username:
 
 			content = self.request.get("content")
@@ -206,20 +116,8 @@ class WikiPage(Handler):
 	def get(self,title):
 		#check user identity
 		cookie_val = self.request.cookies.get('user_id')
-		username = None
 		#check whether it is login user
-		if cookie_val:
-			user_id = util.check_secure_val(cookie_val)
-			if user_id:
-				user_id = int(user_id)
-				user = User.get_by_id(user_id)
-
-				if user:
-					username = user.username
-					#punish the stupid hacker
-				else:	
-					self.error("404")
-					return
+		username = checkUser(cookie_val)
 
 		version = self.request.get("v")
 
@@ -236,10 +134,7 @@ class WikiPage(Handler):
 					return
 			else:
 				self.redirect("/"+title)
-				return
-
-
-				
+				return		
 		else:
 			query = Page.fetchPages(title)
 			page = query.fetch(1)
@@ -254,28 +149,15 @@ class WikiPage(Handler):
 			if page:
 				self.render("wikipage_normal.html",title=title,content=page[0].content)
 			else:
-				self.write("<h1>Authentication Failed</h1>"\
-							"<h1>GO BACK BOY!</h1>")
+				self.redirect("/login")
 
 class HistoryPage(Handler):
 	
 	def get(self, title):
 		#check user identity
 		cookie_val = self.request.cookies.get('user_id')
-		username = None
 		#check whether it is login user
-		if cookie_val:
-			user_id = util.check_secure_val(cookie_val)
-			if user_id:
-				user_id = int(user_id)
-				user = User.get_by_id(user_id)
-
-				if user:
-					username = user.username
-					#punish the stupid hacker
-				else:	
-					self.error("404")
-					return
+		username = checkUser(cookie_val)
 		
 		query = Page.fetchPages(title)
 		pages = list(query)
@@ -316,8 +198,6 @@ class LoginPage(Handler):
 		else:
 			error="Invalid username or password"
 			self.render_front(error= error, username= username, password= password)
-
-
 
 class LogoutPage(Handler):
 	def get(self):
@@ -408,16 +288,14 @@ class SignupPage(Handler):
 			#redirect to the HomePage
 			self.redirect("/")
 
+"""
 class FlushHandler(Handler):
 	def get(self):
 		memcache.flush_all()
 		self.redirect("/")
-		
-app = webapp2.WSGIApplication([('/flush',FlushHandler),
-    							('/blog/newpost',PostPage),
-    							('/blog',MainPage),
-    							('/blog/([0-9]+)',PostHandler),
-    							('/signup',SignupPage),
+"""
+
+app = webapp2.WSGIApplication([ ('/signup',SignupPage),
     							('/login',LoginPage),
     							('/logout',LogoutPage),
     							('/_edit/(\w*)',EditPage),
