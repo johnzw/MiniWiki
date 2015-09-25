@@ -2,13 +2,16 @@
 Wiki-like website deployed on Google App Engine
 
 ### Why I make this
-It is a final project of Web Development on Udacity. It has been deployed on *Google App Engine*. Click **[here](http://fancy-donkey.appspot.com/)** to check out.
+It is a final project of Web Development on Udacity. It has been deployed on **Google App Engine**. Click http://fancy-donkey.appspot.com/ to check out.
 
 ### What it does
 As a sign-uped user, you can:
 * view different Wiki pages
 * create and edit different Wiki pages
 * view the previous versions of each Wikipage and edit on them
+
+####how you create another page?
+just tpye http://fancy-donkey.appspot.com/the-page-you-want-to-create as the new page's url!
 
 As a normal visitor, you can:
 * view different Wiki pages
