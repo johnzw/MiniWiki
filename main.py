@@ -28,13 +28,14 @@ class Handler(webapp2.RequestHandler):
 		self.write(self.render_str(template,**kw))
 
 
-def checkUser(cookie_val):
+def checkUser(cookie_val=None):
 	
+	if cookie_val==None:
+		cookie_val=""
 	username = memcache.get(cookie_val)
 
 	if not username:
 		user_id = util.check_secure_val(cookie_val)
-		logging.error(user_id)
 		if user_id:
 			user_id = int(user_id)
 			user = User.get_by_id(user_id)

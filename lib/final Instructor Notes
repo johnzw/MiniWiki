@@ -43,6 +43,8 @@ Issue
 	2)redirect to “/_edit/something”
 work->	3)well, add get para in the url ***
 
+—>address
+
 2)template (not that important)
 	maybe merge separate templates into whole(is this good ideas)
 	or find a way to better manage them
@@ -85,5 +87,5 @@ database
 beginning issues
 	When the database is empty, the homepage won’t show up
 
-	
+->address
 	
