@@ -21,4 +21,4 @@ As a normal visitor, you can:
 I find it awesome that **you can create raw HTML contents in this website.** Well, a nice and troublesome feature.
 
 ### About security issue
-This project adds salt to the hashed password, which may add a little may safty to this website.
+This project adds salt to the hashed password, which may add a little more safty to this website.
