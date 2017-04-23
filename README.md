@@ -10,7 +10,7 @@ As a sign-uped user, you can:
 * create and edit different Wiki pages
 * view the previous versions of each Wikipage and edit on them
 
-####how you create another page?
+#### how you create another page?
 just tpye http://fancy-donkey.appspot.com/the-page-you-want-to-create as the new page's url!
 
 As a normal visitor, you can:
